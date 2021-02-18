@@ -18,7 +18,7 @@ Controls:
 
 [RIGHT] - next mode
 
-The first three modes (7, 21, 108) always start at 0.
+The first three modes (7, 21 and 108) always start at 0.
 
 The ten tally counter modes store the current counter value in the EEPROM. Maximum counting value for the tally counting modes is 999999.
 
