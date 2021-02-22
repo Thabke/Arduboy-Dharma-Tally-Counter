@@ -1,7 +1,7 @@
 # Arduboy-Dharma-Tally-Counter
 Tally counter for Arduboy compatible platform with dharmic bias.
 
-Version 1.4
+Version 1.5
 
 Controls:<br>
 [A] - increase counter<br>
