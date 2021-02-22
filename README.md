@@ -3,10 +3,8 @@ Tally counter for Arduboy compatible platform with dharmic bias.
 
 Version 1.3
 
-Controls:
-
-[A] - increase counter
-
+Controls:<br>
+[A] - increase counter<br>
 [B] - reset counter to 0
 
 [UP] - decrease counter
