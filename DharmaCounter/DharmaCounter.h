@@ -2,7 +2,7 @@
 //Lobsang Thabke
 //November 22/02/2021
 //Header file of Dharma Counter for ArduBoy 
-//Ver. 1.4
+//Ver. 1.5
 //
 #define INIT_FLAG 96  //First run flag, changing its value will result in a memory reset 
 #define MODE_MAX 12   //Last mode number (modes are counted from 0)
@@ -22,6 +22,7 @@ Arduboy2 arduboy;
 unsigned long counter = 0;  //current counter value
 byte mode = 0;              //current mode
 unsigned long max_value [] = {7, 21, 108, 999999, 999999, 999999, 999999, 999999, 999999, 999999, 999999, 999999, 999999}; //maximum counter value for each mode
+bool execChk = false;       //Checking flag for justPressed() execution
 
 //Button B long time press detection
 unsigned long pressedTime  = 0;

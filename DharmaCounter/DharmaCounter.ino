@@ -2,7 +2,7 @@
 //Lobsang Thabke
 //November 22/02/2021
 //Dharma Counter for ArduBoy
-//Ver. 1.4
+//Ver. 1.5
 //
 //--- Controls:
 //[A] - increase counter
@@ -396,7 +396,7 @@ void increaseCounter ()
       sound.tones(button_sound); //play sound
   }
   else
-    sound.tones(button_sound); //play sound
+    sound.tones(end_sound); //play end sound
 
   saveCounter(); //Save current counter value
 }
@@ -480,7 +480,16 @@ void btnCheck ()
   {
     pressedTime = millis(); //read current timer value for long press detection
 
-    decreaseCounter (); //Decrease counter value
+    decreaseCounter ();     //Decrease counter value
+
+    //During tests, it was noted that sometimes the justPressed()
+    //does not executed before pressed(), so this flag was added 
+    execChk = true;         //Set execution flag
+  }
+
+  //Released
+  if (arduboy.justReleased(B_BUTTON)) {
+    execChk = false;  //Reset justPressed() execution flag
   }
 
   //Pressed
@@ -506,24 +515,28 @@ void btnCheck ()
     //Draw the pressed A button sprite
     Sprites::drawOverwrite(96, 56, btnA, 0);
   }
-  if (arduboy.pressed(B_BUTTON)) {
-    //Draw the pressed B button sprite
-    Sprites::drawOverwrite(96, 48, btnB, 0);
-
-    if (counter > 0)
+  if (arduboy.pressed(B_BUTTON))
+  {
+    if (execChk)  //If justPressed() was executed before pressed()
     {
-      retainTime = millis(); //read current timer value for long press detection
+      //Draw the pressed B button sprite
+      Sprites::drawOverwrite(96, 48, btnB, 0);
 
-      //If button B was pressed long enough
-      if ((mode > 2) && (mode <= MODE_MAX)) //Tally counter modes begin from 3
+      if (counter > 0)
       {
-        if ((retainTime - pressedTime) > LONG_PRESS_TIME*2) //For tally counters modes the long press time is double
-          resetCounter (); //Reset the tally counter to 0
-      }
-      else //for first three modes
-      {
-        if ((retainTime - pressedTime) > LONG_PRESS_TIME)
-          resetCounter (); //Reset the counter to 0
+        retainTime = millis(); //read current timer value for long press detection
+
+        //If button B was pressed long enough
+        if ((mode > 2) && (mode <= MODE_MAX)) //Tally counter modes begin from 3
+        {
+          if ((retainTime - pressedTime) > LONG_PRESS_TIME * 2) //For tally counters modes the long press time is double
+            resetCounter (); //Reset the tally counter to 0
+        }
+        else //for first three modes
+        {
+          if ((retainTime - pressedTime) > LONG_PRESS_TIME)
+            resetCounter (); //Reset the counter to 0
+        }
       }
     }
   }
