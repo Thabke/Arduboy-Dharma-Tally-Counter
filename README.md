@@ -1,14 +1,14 @@
 # Arduboy-Dharma-Tally-Counter
 Tally counter for Arduboy compatible platform with dharmic bias.
 
-Version 1.3
+Version 1.4
 
 Controls:<br>
 [A] - increase counter<br>
-[B] - reset counter to 0
-[UP] - decrease counter<br>
+[B] - decrease counter<br>
+[B] (long press) - reset counter to 0<br>
+[UP] - switch audio ON/OFF<br>
 [DOWN] - increase counter<br>
-[UP + DOWN] - switch audio ON/OFF<br>
 [LEFT] - previous mode<br>
 [RIGHT] - next mode
 
