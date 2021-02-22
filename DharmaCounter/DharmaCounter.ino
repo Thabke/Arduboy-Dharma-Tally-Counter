@@ -1,15 +1,15 @@
 //
 //Lobsang Thabke
-//November 21/02/2021
+//November 22/02/2021
 //Dharma Counter for ArduBoy
-//Ver. 1.3
+//Ver. 1.4
 //
 //--- Controls:
 //[A] - increase counter
-//[B] - reset counter to 0
-//[UP] - decrease counter
+//[B] - decrease counter
+//[B] (long press) - reset counter to 0
+//[UP] - switch audio ON/OFF
 //[DOWN] - increase counter
-//[UP + DOWN] - switch audio ON/OFF
 //[LEFT] - previous mode
 //[RIGHT] - next mode
 //---
@@ -374,25 +374,12 @@ void soundSwitch ()
   {
     arduboy.audio.off(); //Audio OFF
     arduboy.audio.saveOnOff(); //Save audio state (ON or OFF)
-
-    arduboy.setCursor(24, 28);
-    arduboy.print("SOUND OFF"); //Show info
-    arduboy.display(); //Update display
-    arduboy.waitNoButtons();  //Wait until buttons have been released
-    //arduboy.delayShort (500);  //wait 0.5 sec
   }
   else
   {
     arduboy.audio.on(); //Audio ON
     arduboy.audio.saveOnOff(); //Save audio state (ON or OFF)
-    //EEPROM.write (SOUND_ADDR, 1); //Save audio state (1 - ON, 0 - OFF)
     sound.tones(button_sound); //play sound
-
-    arduboy.setCursor(24, 28);
-    arduboy.print("SOUND ON"); //Show info
-    arduboy.display(); //Update display
-    arduboy.waitNoButtons();  //Wait until buttons have been released
-    //arduboy.delayShort (500);  //wait 0.5 sec
   }
 }
 
@@ -443,10 +430,10 @@ void resetCounter ()
 
 //Buttons checking
 //[A] - increase counter
-//[B] - reset counter to 0
-//[UP] - decrease counter
+//[B] - decrease counter
+//[B] (long press) - reset counter to 0
+//[UP] - switch audio ON/OFF
 //[DOWN] - increase counter
-//[UP + DOWN] - switch audio ON/OFF
 //[LEFT] - previous mode
 //[RIGHT] - next mode
 void btnCheck ()
@@ -479,7 +466,7 @@ void btnCheck ()
   }
   if (arduboy.justPressed(UP_BUTTON))
   {
-    decreaseCounter (); //Decrease counter value
+    soundSwitch(); //Sound control
   }
   if (arduboy.justPressed(DOWN_BUTTON))
   {
@@ -491,7 +478,9 @@ void btnCheck ()
   }
   if (arduboy.justPressed(B_BUTTON))
   {
-    resetCounter (); //Reset the counter to 0
+    pressedTime = millis(); //read current timer value for long press detection
+
+    decreaseCounter (); //Decrease counter value
   }
 
   //Pressed
@@ -504,20 +493,14 @@ void btnCheck ()
     Sprites::drawOverwrite(96, 21, btnR, 0);
   }
   if (arduboy.pressed(UP_BUTTON)) {
-    //Draw the pressed up button sprite
-    Sprites::drawOverwrite(96, 39, btnUp, 0);
-
-    //Double button pressing
-    if (arduboy.justPressed(DOWN_BUTTON))
-      soundSwitch(); //Sound control
+    if (arduboy.audio.enabled())
+      Sprites::drawOverwrite(96, 31, btnUp, 0); //Draw the pressed up button sprite
+    else
+      Sprites::drawOverwrite(96, 31, btnUpNoSndPress, 0); //Draw pressed button UP with AUDIO OFF symbol
   }
   if (arduboy.pressed(DOWN_BUTTON)) {
     //Draw the pressed down button sprite
-    Sprites::drawOverwrite(96, 48, btnDwn, 0);
-
-    //Double button pressing
-    if (arduboy.justPressed(UP_BUTTON))
-      soundSwitch(); //Sound control
+    Sprites::drawOverwrite(96, 39, btnDwn, 0);
   }
   if (arduboy.pressed(A_BUTTON)) {
     //Draw the pressed A button sprite
@@ -525,7 +508,24 @@ void btnCheck ()
   }
   if (arduboy.pressed(B_BUTTON)) {
     //Draw the pressed B button sprite
-    Sprites::drawOverwrite(96, 30, btnB, 0);
+    Sprites::drawOverwrite(96, 48, btnB, 0);
+
+    if (counter > 0)
+    {
+      retainTime = millis(); //read current timer value for long press detection
+
+      //If button B was pressed long enough
+      if ((mode > 2) && (mode <= MODE_MAX)) //Tally counter modes begin from 3
+      {
+        if ((retainTime - pressedTime) > LONG_PRESS_TIME*2) //For tally counters modes the long press time is double
+          resetCounter (); //Reset the tally counter to 0
+      }
+      else //for first three modes
+      {
+        if ((retainTime - pressedTime) > LONG_PRESS_TIME)
+          resetCounter (); //Reset the counter to 0
+      }
+    }
   }
 }
 
@@ -715,6 +715,8 @@ void setup()
 
   drawTitle(); //Draw boot logo title
   arduboy.clear();
+
+  pressedTime = millis(); //Initial read current timer value for long press detection
 }
 
 //Main loop
@@ -795,9 +797,10 @@ void loop()
       break;
   }
 
-  //Draw 'PRESS A' text if counter value is 0
-  //    if (counter == 0)
-  //      Sprites::drawOverwrite(29, 27, press_A, 0);
+  //Draw button UP with AUDIO OFF symbol
+  //Checking for pressed button B is performed so as not to interfere with the drawing of the pressed button B symbol
+  if (!arduboy.audio.enabled() && !arduboy.pressed(UP_BUTTON))
+    Sprites::drawOverwrite(96, 31, btnUpNoSnd, 0);
 
   //Send screen buffer to serial for screen mirroring functionality
   //Serial.write(arduboy.getBuffer(), 128 * 64 / 8);
