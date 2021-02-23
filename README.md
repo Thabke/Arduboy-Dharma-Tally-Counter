@@ -16,3 +16,4 @@ The first three modes (7, 21 and 108) always start at 0.<br>
 The ten tally counter modes store the current counter value in the EEPROM. Maximum counting value for the tally counting modes is 999999.<br>
 In the 'Titles.h' file, you can add titles for the tally counter modes. Changing the title and reuploading of the program do not change the stored counter value!
 
+https://felipemanga.github.io/ProjectABE/?url=https://github.com/Thabke/Arduboy-Dharma-Tally-Counter/blob/main/DharmaCounter/DharmaCounter.hex
