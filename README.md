@@ -17,3 +17,11 @@ The ten tally counter modes store the current counter value in the EEPROM. Maxim
 In the 'Titles.h' file, you can add titles for the tally counter modes. Changing the title and reuploading of the program do not change the stored counter value!
 
 <a href="https://felipemanga.github.io/ProjectABE/?url=https://github.com/Thabke/Arduboy-Dharma-Tally-Counter/raw/main/DharmaCounter/DharmaCounter.hex">Look in the emulator</a>
+
+Some screenshots:
+<img src="https://github.com/Thabke/Arduboy-Dharma-Tally-Counter/raw/main/Screenshots/mode7.png" alt="Mode 7 counts" width="128" height="64">
+<img src="https://github.com/Thabke/Arduboy-Dharma-Tally-Counter/raw/main/Screenshots/mode21.png" alt="Mode 21 counts" width="128" height="64">
+<img src="https://github.com/Thabke/Arduboy-Dharma-Tally-Counter/raw/main/Screenshots/mode108.png" alt="Mode mala 108 counts (beads)" width="128" height="64">
+<img src="https://github.com/Thabke/Arduboy-Dharma-Tally-Counter/raw/main/Screenshots/tally1.png" alt="Tally counter" width="128" height="64">
+<img src="https://github.com/Thabke/Arduboy-Dharma-Tally-Counter/raw/main/Screenshots/tally2.png" alt="Tally counter with user custom title" width="128" height="64">
+<img src="https://github.com/Thabke/Arduboy-Dharma-Tally-Counter/raw/main/Screenshots/tally3.png" alt="Tally counter with user custom title" width="128" height="64">
