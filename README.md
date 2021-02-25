@@ -19,6 +19,7 @@ In the 'Titles.h' file, you can add titles for the tally counter modes. Changing
 <a href="https://felipemanga.github.io/ProjectABE/?url=https://github.com/Thabke/Arduboy-Dharma-Tally-Counter/raw/main/DharmaCounter/DharmaCounter.hex">Look in the emulator</a>
 
 Some screenshots:
+
 <img src="https://github.com/Thabke/Arduboy-Dharma-Tally-Counter/raw/main/Screenshots/mode7.png" alt="Mode 7 counts" width="128" height="64">
 <img src="https://github.com/Thabke/Arduboy-Dharma-Tally-Counter/raw/main/Screenshots/mode21.png" alt="Mode 21 counts" width="128" height="64">
 <img src="https://github.com/Thabke/Arduboy-Dharma-Tally-Counter/raw/main/Screenshots/mode108.png" alt="Mode mala 108 counts (beads)" width="128" height="64">
