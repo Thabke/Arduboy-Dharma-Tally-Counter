@@ -1,8 +1,8 @@
 //
 //Lobsang Thabke
-//November 22/02/2021
+//November 25/02/2021
 //Dharma Counter for ArduBoy
-//Ver. 1.5
+//Ver. 1.6
 //
 //--- Controls:
 //[A] - increase counter
@@ -120,7 +120,7 @@ void mode108Draw ()
   int y = 9;      //Screen position
 
   //Draw mala
-  Sprites::drawOverwrite(0, 0, mala108, 0);
+  Sprites::drawOverwrite(0, 0, mala108empty, 0);
 
   if (counter == 108)
   {
@@ -181,8 +181,16 @@ void mode108Draw ()
   }
 
   //Draw beads
-  for (int i = 0; i < counter; i++)
-    Sprites::drawExternalMask(beadsX[i], beadsY[i], bead, bead_mask, 0, 0);
+  if (counter < 108)
+  {
+    for (int i = 0; i < counter; i++)
+      Sprites::drawExternalMask(beadsX[i], beadsY[i], bead, bead_mask, 0, 0);     //Draw beads, new for each count
+  }
+  else //counter == 108
+  {
+    for (int i = 0; i < counter; i++)
+      Sprites::drawExternalMask(beadsX[i], beadsY[i], beadBld, bead_mask, 0, 0);  //Draw bold beads
+  }
 }
 
 //Draw numbers for the tally counter modes
@@ -191,7 +199,7 @@ void modeTallyDraw (String title)
   String cnt;     //Counter value in text
   String digit;   //Different digits from the counter number
   int digits = 0; //length of the counter number
-  int y = 9;      //Screen position
+  int y = 9;      //Counting numbers screen position
 
   //if (counter < 10000) counter = 98990; //for testing purposes
 
@@ -200,13 +208,9 @@ void modeTallyDraw (String title)
     //Printing title (optional)
     if (title != "")
     {
-      if (title.length() > 16)
-        title.remove (15);  //Title max size is 16 characters
-      arduboy.setCursor((96 - title.length() * 6) / 2, 0); //Place the title in the center of the screen
-      arduboy.print(title);
+      printingTitle (title, 0); //Put title in the top of the screen
       y = 14; //Move the numbers on the screen under the title
     }
-
     cnt = String (counter); //Convert digits of the counter to text
     digits = cnt.length();  //Found length of the counter number
   }
@@ -215,12 +219,8 @@ void modeTallyDraw (String title)
     //Print the mode name in the centre of the screen
     if (title != "")  //Printing the title instead of the mode name
     {
-      if (title.length() > 16)
-        title.remove (15);  //Title max size is 16 characters
-      arduboy.setCursor((96 - title.length() * 6) / 2, 22); //Put the title in the centre of screen
-      arduboy.print(title);
-      //Draw "PRESS [A]"
-      Sprites::drawOverwrite(30, 36, press_A, 0);
+      printingTitle(title, 22); //Put title in the middle of the screen
+      Sprites::drawOverwrite(30, 36, press_A, 0); //Draw "PRESS [A]"
     }
     else
     {
@@ -277,8 +277,7 @@ void modeTallyDraw (String title)
     case 5: //Five digits
       //First digit in the counter
       digit = cnt[0];
-      Sprites::drawOverwrite(1, y + 10, numbers5dgt, digit.toInt());
-      //Second digit in the counter
+      Sprites::drawOverwrite(1, y + 10, numbers5dgt, digit.toInt());      //Second digit in the counter
       digit = cnt[1];
       Sprites::drawOverwrite(19, y + 10, numbers5dgt, digit.toInt());
       //Third digit in the counter
@@ -315,6 +314,50 @@ void modeTallyDraw (String title)
       // statements
       break;
   }
+}
+
+//Printing title
+void printingTitle (String title, byte y)
+{
+  title_y = y;  //Horizontal coordinate of the title
+
+  if (title.length() > 16)
+  {
+    if (first_call) //this part will be executed only once
+    {
+      current_title = title + " ";  //add space in the edn of the title
+      creeping_on = true;           //creeping text-line effect is ON
+      first_call = false;           //do not execute this part again before changing the current mode to the new
+    }
+  }
+  else //If title just 16 letter or less, just print it in the centre
+  {
+    arduboy.setCursor((96 - title.length() * 6) / 2, title_y);
+    arduboy.print(title);
+  }
+}
+
+//Creeping text line effect for the long titles
+void creepingLineEffect ()
+{
+  //Creeping text line effect
+  if (creeping_line_delay_counts > creeping_line_delay)
+  {
+    if (creeping_line_counter < 6)
+      creeping_line_counter++;
+    else
+    {
+      current_title = current_title.substring(1) + current_title.charAt(0); //Letter shifting - first letter go to back
+      creeping_line_counter = 0;
+    }
+
+    creeping_line_delay_counts = 0;
+  }
+  else
+    creeping_line_delay_counts++;
+  arduboy.setCursor(-creeping_line_counter, title_y); //Creeping text to left pixel by pixel
+  //arduboy.setCursor(0, 0); //Creeping text to left letter by letter
+  arduboy.print(current_title.substring(0, 17)); //Print first 18 letters
 }
 
 //Play the mode sounds
@@ -447,6 +490,9 @@ void btnCheck ()
 
     playModeSound (); //play sound
 
+    creeping_on = false; //Reset creeping text line effect
+    first_call = true;  //Is function called first time or not
+
     EEPROM.put (MODE_ADDR, mode); //Save current mode number
 
     loadCounter(); //Load current counter value
@@ -459,6 +505,9 @@ void btnCheck ()
       mode = 0;
 
     playModeSound (); //play sound
+
+    creeping_on = false; //Reset creeping text line effect
+    first_call = true;  //Is function called first time or not
 
     EEPROM.put (MODE_ADDR, mode); //Save current mode number
 
@@ -483,7 +532,7 @@ void btnCheck ()
     decreaseCounter ();     //Decrease counter value
 
     //During tests, it was noted that sometimes the justPressed()
-    //does not executed before pressed(), so this flag was added 
+    //does not executed before pressed(), so this flag was added
     execChk = true;         //Set execution flag
   }
 
@@ -526,13 +575,19 @@ void btnCheck ()
       {
         retainTime = millis(); //read current timer value for long press detection
 
+        //Redraw button B with a zero character to warn about zeroing the counter value 
+        if ((retainTime - pressedTime) > LONG_PRESS_TIME/4)
+          Sprites::drawOverwrite(96, 48, btnBzero, 0); //First draw the pressed B with zero button sprite
+        if ((retainTime - pressedTime) > LONG_PRESS_TIME/2)
+          Sprites::drawOverwrite(96, 48, btnBzero_inverse, 0); //Second draw the pressed B with zero inversed button sprite
+          
         //If button B was pressed long enough
         if ((mode > 2) && (mode <= MODE_MAX)) //Tally counter modes begin from 3
         {
           if ((retainTime - pressedTime) > LONG_PRESS_TIME * 2) //For tally counters modes the long press time is double
             resetCounter (); //Reset the tally counter to 0
         }
-        else //for first three modes
+        else //reset counter for first three modes
         {
           if ((retainTime - pressedTime) > LONG_PRESS_TIME)
             resetCounter (); //Reset the counter to 0
@@ -737,6 +792,10 @@ void loop()
 {
   arduboy.clear();
   arduboy.pollButtons();
+
+  //Creeping text line effect for the long titles
+  if (creeping_on)
+    creepingLineEffect ();
 
   //Draw menu sprite
   Sprites::drawOverwrite(96, 0, menu, 0);

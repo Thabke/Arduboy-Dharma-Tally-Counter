@@ -1,6 +1,7 @@
+//Ver. 1.6
 //
-//Here you can set your own titles for all counter modes.
-//The length of the title is no more than 16 characters. All characters after 16 will be cut.
+//Here you can set your own titles for all tally counter modes.
+//If the title size is more than 16 letters, the text will move with the effect of the creeping line. 
 //Changing the title and reuploading of the program do not change the stored counter value! 
 //
 
