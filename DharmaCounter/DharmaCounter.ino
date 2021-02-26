@@ -24,8 +24,6 @@
 #include "DharmaCounter.h"
 #include "Titles.h"
 
-ArduboyTones sound(arduboy.audio.enabled);  //Add audio
-
 //Draw the vishva vajra for mode 7
 void mode7Draw ()
 {
@@ -201,7 +199,7 @@ void modeTallyDraw (String title)
   int digits = 0; //length of the counter number
   int y = 9;      //Counting numbers screen position
 
-  //if (counter < 10000) counter = 98990; //for testing purposes
+  //if (counter < 100000) counter = 108000; //for testing purposes
 
   if (counter > 0)
   {
@@ -277,7 +275,8 @@ void modeTallyDraw (String title)
     case 5: //Five digits
       //First digit in the counter
       digit = cnt[0];
-      Sprites::drawOverwrite(1, y + 10, numbers5dgt, digit.toInt());      //Second digit in the counter
+      Sprites::drawOverwrite(1, y + 10, numbers5dgt, digit.toInt());
+      //Second digit in the counter
       digit = cnt[1];
       Sprites::drawOverwrite(19, y + 10, numbers5dgt, digit.toInt());
       //Third digit in the counter
@@ -876,6 +875,7 @@ void loop()
 
   //Send screen buffer to serial for screen mirroring functionality
   //Serial.write(arduboy.getBuffer(), 128 * 64 / 8);
+  
   //Update display
   arduboy.display();
 }

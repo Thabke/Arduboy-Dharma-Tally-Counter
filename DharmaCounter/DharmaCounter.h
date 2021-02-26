@@ -18,6 +18,7 @@
 #define LONG_PRESS_TIME 500 //500 milliseconds - button long press time, it will be doubled for tally counter modes 
 
 Arduboy2 arduboy;
+ArduboyTones sound(arduboy.audio.enabled);  //Add audio
 
 unsigned long counter = 0;  //current counter value
 byte mode = 0;              //current mode
