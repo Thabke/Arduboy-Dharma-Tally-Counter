@@ -1,7 +1,7 @@
 # Arduboy-Dharma-Tally-Counter
 Tally counter for Arduboy compatible platform with dharmic bias.
 
-Version 1.6
+Version 1.7
 
 Controls:<br>
 [A] - increase counter<br>
@@ -15,6 +15,7 @@ Controls:<br>
 The first three modes (7, 21 and 108) always start at 0.<br>
 The ten tally counter modes store the current counter value in the EEPROM. Maximum counting value for the tally counting modes is 999999.<br>
 In the 'Titles.h' file, you can add titles for the tally counter modes. Changing the title and reuploading of the program do not change the stored counter value!
+In 'DharmaCounter.h' by changing the value of SCREEN_MAX_TIME in milliseconds, you can add the display auto-turn off functionality for energy saving purposes.
 
 <a href="https://felipemanga.github.io/ProjectABE/?url=https://github.com/Thabke/Arduboy-Dharma-Tally-Counter/raw/main/DharmaCounter/DharmaCounter.hex">Look in the emulator</a>
 
