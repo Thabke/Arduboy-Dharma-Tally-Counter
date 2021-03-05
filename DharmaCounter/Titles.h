@@ -1,4 +1,4 @@
-//Ver. 1.6
+//Ver. 1.7
 //
 //Here you can set your own titles for all tally counter modes.
 //If the title size is more than 16 letters, the text will move with the effect of the creeping line. 

@@ -1,8 +1,8 @@
 //
 //Lobsang Thabke
-//November 25/02/2021
+//November 05/03/2021
 //Header file of Dharma Counter for ArduBoy
-//Ver. 1.6
+//Ver. 1.7
 //
 #define INIT_FLAG 96  //First run flag, changing its value will result in a memory reset 
 #define MODE_MAX 12   //Last mode number (modes are counted from 0)
@@ -15,7 +15,9 @@
 #define TALLY_REW 100 //Maximum rewrites in one place of EEPROM for tally counter
 #define TABLE_REW 100 //Maximum rewrites in one place of EEPROM for adresses table
 
-#define LONG_PRESS_TIME 500 //500 milliseconds - button long press time, it will be doubled for tally counter modes 
+#define LONG_PRESS_TIME 500   //500 milliseconds - button long press time, it will be doubled for tally counter modes 
+//#define SCREEN_MAX_TIME 10000 //Display turning off after that time in milliseconds for power saving
+#define SCREEN_MAX_TIME 0   //Put 0 for disable display turning off function
 
 Arduboy2 arduboy;
 ArduboyTones sound(arduboy.audio.enabled);  //Add audio
@@ -39,6 +41,11 @@ String current_title;                 //Copy of the current mode's title
 //Button B long time press detection
 unsigned long pressedTime  = 0;
 unsigned long retainTime = 0;
+
+//Power saving
+unsigned long turning_off_timer;      //Timer for display turning off functionality 
+bool displayisON = true;              //Current display state (true - ON, false - OFF)
+bool imageisUpdated = true;           //Flag for indication of the on-screen image changing (true - image was changed, false - was not) 
 
 //EEPROM
 int eeprom_size;          //mc's EEPROM length (1024 bytes for Arduboy)

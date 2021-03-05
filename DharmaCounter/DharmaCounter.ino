@@ -1,8 +1,8 @@
 //
 //Lobsang Thabke
-//November 25/02/2021
+//November 05/03/2021
 //Dharma Counter for ArduBoy
-//Ver. 1.6
+//Ver. 1.7
 //
 //--- Controls:
 //[A] - increase counter
@@ -23,6 +23,164 @@
 #include <ArduboyTones.h>
 #include "DharmaCounter.h"
 #include "Titles.h"
+
+/////////////////////
+// Initializations //
+/////////////////////
+void setup()
+{
+  // open the serial port at 115200 bps:
+  Serial.begin(115200);
+
+  eeprom_size = EEPROM.length (); //Max length of EEPROM
+  initEEPROM (); //Initialization of EEPROM and loading all stored values from EEPROM
+
+  arduboy.begin();
+
+  //Initializing randomizer
+  arduboy.initRandomSeed();
+
+  drawTitle(); //Draw boot logo title
+  arduboy.clear();
+
+  pressedTime = millis();       //Initial read current timer value for long press detection
+  turning_off_timer = millis();  //Initial value of the timer for display turning off functionality
+}
+
+///////////////
+// Main loop //
+///////////////
+void loop()
+{
+  arduboy.clear();
+  arduboy.pollButtons();
+
+  //Creeping text line effect for the long titles
+  if (creeping_on)
+  {
+    creepingLineEffect ();
+    imageisUpdated = true;  //Update display image
+  }
+
+  Sprites::drawOverwrite(96, 0, menu, 0);  //Draw menu sprite
+
+  //Buttons checking
+  btnCheck ();
+
+  if (imageisUpdated) //Update the image on the screen only if something has changed
+  {
+    //Draw according to current mode
+    switch (mode) {
+      case 0:
+        mode7Draw (); //Draw a vishva vajra sprites for 7 counts mode
+        break;
+      case 1:
+        mode21Draw (); //Draw a vajra sprites for 21 counts mode
+        break;
+      case 2:
+        mode108Draw (); //Draw a counter for 108 counts mode
+        break;
+      case 3:
+        //Draw the tally counter one mode text
+        Sprites::drawOverwrite(96, 9, mode_tally1, 0);
+        modeTallyDraw (TALLY1_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
+        break;
+      case 4:
+        //Draw the tally counter two mode text
+        Sprites::drawOverwrite(96, 9, mode_tally2, 0);
+        modeTallyDraw (TALLY2_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
+        break;
+      case 5:
+        //Draw the tally counter three mode text
+        Sprites::drawOverwrite(96, 9, mode_tally3, 0);
+        modeTallyDraw (TALLY3_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
+        break;
+      case 6:
+        //Draw the tally counter four mode text
+        Sprites::drawOverwrite(96, 9, mode_tally4, 0);
+        modeTallyDraw (TALLY4_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
+        break;
+      case 7:
+        //Draw the tally counter five mode text
+        Sprites::drawOverwrite(96, 9, mode_tally5, 0);
+        modeTallyDraw (TALLY5_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
+        break;
+      case 8:
+        //Draw the tally counter six mode text
+        Sprites::drawOverwrite(96, 9, mode_tally6, 0);
+        modeTallyDraw (TALLY6_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
+        break;
+      case 9:
+        //Draw the tally counter seven mode text
+        Sprites::drawOverwrite(96, 9, mode_tally7, 0);
+        modeTallyDraw (TALLY7_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
+        break;
+      case 10:
+        //Draw the tally counter eight mode text
+        Sprites::drawOverwrite(96, 9, mode_tally8, 0);
+        modeTallyDraw (TALLY8_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
+        break;
+      case 11:
+        //Draw the tally counter nine mode text
+        Sprites::drawOverwrite(96, 9, mode_tally9, 0);
+        modeTallyDraw (TALLY9_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
+        break;
+      case 12:
+        //Draw the tally counter ten mode text
+        Sprites::drawOverwrite(96, 9, mode_tally10, 0);
+        modeTallyDraw (TALLY10_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
+        break;
+      default:
+        // statements
+        break;
+    }
+
+    //Draw button UP with AUDIO OFF symbol
+    //Checking for pressed button B is performed so as not to interfere with the drawing of the pressed button B symbol
+    if (!arduboy.audio.enabled() && !arduboy.pressed(UP_BUTTON))
+      Sprites::drawOverwrite(96, 31, btnUpNoSnd, 0);
+
+    //Send screen buffer to serial for screen mirroring functionality
+    //Serial.write(arduboy.getBuffer(), 128 * 64 / 8);
+
+    //Update display
+    arduboy.display();
+
+    imageisUpdated = false;  //Stop updating display image for power saving purposes
+  }
+  else
+    arduboy.idle(); //Power saving
+
+  //Display turning off functionality
+  if (SCREEN_MAX_TIME > 0)  //If SCREEN_MAX_TIME = 0 - display turning off functionality disabled
+  {
+    if (displayisON)
+    {
+      if (millis() - turning_off_timer > SCREEN_MAX_TIME)  //After SCREEN_MAX_TIME millisecons display turning off for power saving
+      {
+        arduboy.displayOff();
+        displayisON = false;
+      }
+    }
+  }
+}
+
+//*** Functions ***
+
+//If the display is turned off, turn it on
+void checkDisplay()
+{
+  if (SCREEN_MAX_TIME > 0)  //If SCREEN_MAX_TIME = 0 - display turning off functionality disabled
+  {
+    if (!displayisON)
+    {
+      arduboy.displayOn();
+      displayisON = true;
+    }
+
+    turning_off_timer = millis(); //reset turning off timer
+  }
+}
 
 //Draw the vishva vajra for mode 7
 void mode7Draw ()
@@ -354,6 +512,7 @@ void creepingLineEffect ()
   }
   else
     creeping_line_delay_counts++;
+
   arduboy.setCursor(-creeping_line_counter, title_y); //Creeping text to left pixel by pixel
   //arduboy.setCursor(0, 0); //Creeping text to left letter by letter
   arduboy.print(current_title.substring(0, 17)); //Print first 18 letters
@@ -483,6 +642,8 @@ void btnCheck ()
   //Just pressed
   if (arduboy.justPressed(LEFT_BUTTON))
   {
+    checkDisplay(); //If the display is turned off, turn it on. Also update turning off timer.
+
     mode--; //previous mode
     if (mode > MODE_MAX) //'mode' type is byte, that is why after 0-- it's value will be 254
       mode = MODE_MAX;
@@ -495,9 +656,13 @@ void btnCheck ()
     EEPROM.put (MODE_ADDR, mode); //Save current mode number
 
     loadCounter(); //Load current counter value
+
+    imageisUpdated = true;  //Update display image
   }
   if (arduboy.justPressed(RIGHT_BUTTON))
   {
+    checkDisplay(); //If the display is turned off, turn it on. Also update turning off timer.
+
     mode++; //next mode
 
     if (mode > MODE_MAX) //Go to first mode
@@ -511,33 +676,70 @@ void btnCheck ()
     EEPROM.put (MODE_ADDR, mode); //Save current mode number
 
     loadCounter(); //Load current counter value
+
+    imageisUpdated = true;  //Update display image
   }
   if (arduboy.justPressed(UP_BUTTON))
   {
+    checkDisplay(); //If the display is turned off, turn it on. Also update turning off timer.
+
     soundSwitch(); //Sound control
+
+    imageisUpdated = true;  //Update display image
   }
   if (arduboy.justPressed(DOWN_BUTTON))
   {
+    checkDisplay(); //If the display is turned off, turn it on. Also update turning off timer.
+
     increaseCounter();  //Increase counter value
+
+    imageisUpdated = true;  //Update display image
   }
   if (arduboy.justPressed(A_BUTTON))
   {
+    checkDisplay(); //If the display is turned off, turn it on. Also update turning off timer.
+
     increaseCounter();  //Increase counter value
+
+    imageisUpdated = true;  //Update display image
   }
   if (arduboy.justPressed(B_BUTTON))
   {
-    pressedTime = millis(); //read current timer value for long press detection
+    checkDisplay(); //If the display is turned off, turn it on. Also update turning off timer.
 
-    decreaseCounter ();     //Decrease counter value
+    pressedTime = millis(); //read current timer value for long press detection
 
     //During tests, it was noted that sometimes the justPressed()
     //does not executed before pressed(), so this flag was added
-    execChk = true;         //Set execution flag
+    execChk = true;         //Set justPressed() execution flag
+
+    imageisUpdated = true;  //Update display image
   }
 
   //Released
+  if (arduboy.justReleased(LEFT_BUTTON)) {
+    imageisUpdated = true;  //Update display image
+  }
+  if (arduboy.justReleased(RIGHT_BUTTON)) {
+    imageisUpdated = true;  //Update display image
+  }
+  if (arduboy.justReleased(UP_BUTTON)) {
+    imageisUpdated = true;  //Update display image
+  }
+  if (arduboy.justReleased(DOWN_BUTTON)) {
+    imageisUpdated = true;  //Update display image
+  }
+  if (arduboy.justReleased(A_BUTTON)) {
+    imageisUpdated = true;  //Update display image
+  }
   if (arduboy.justReleased(B_BUTTON)) {
+    checkDisplay(); //If the display is turned off, turn it on. Also update turning off timer.
+
+    decreaseCounter ();     //Decrease counter value
+
     execChk = false;  //Reset justPressed() execution flag
+
+    imageisUpdated = true;  //Update display image
   }
 
   //Pressed
@@ -574,12 +776,12 @@ void btnCheck ()
       {
         retainTime = millis(); //read current timer value for long press detection
 
-        //Redraw button B with a zero character to warn about zeroing the counter value 
-        if ((retainTime - pressedTime) > LONG_PRESS_TIME/4)
+        //Redraw button B with a zero character to warn about zeroing the counter value
+        if ((retainTime - pressedTime) > LONG_PRESS_TIME / 4)
           Sprites::drawOverwrite(96, 48, btnBzero, 0); //First draw the pressed B with zero button sprite
-        if ((retainTime - pressedTime) > LONG_PRESS_TIME/2)
+        if ((retainTime - pressedTime) > LONG_PRESS_TIME / 2)
           Sprites::drawOverwrite(96, 48, btnBzero_inverse, 0); //Second draw the pressed B with zero inversed button sprite
-          
+
         //If button B was pressed long enough
         if ((mode > 2) && (mode <= MODE_MAX)) //Tally counter modes begin from 3
         {
@@ -764,118 +966,4 @@ void drawTitle ()
   arduboy.display();  //Update display
 
   arduboy.delayShort(1000);
-}
-
-//Initializations
-void setup()
-{
-  // open the serial port at 9600 bps:
-  //Serial.begin(115200);
-
-  eeprom_size = EEPROM.length (); //Max length of EEPROM
-  initEEPROM (); //Initialization of EEPROM and loading all stored values from EEPROM
-
-  arduboy.begin();
-
-  //Initializing randomizer
-  arduboy.initRandomSeed();
-
-  drawTitle(); //Draw boot logo title
-  arduboy.clear();
-
-  pressedTime = millis(); //Initial read current timer value for long press detection
-}
-
-//Main loop
-void loop()
-{
-  arduboy.clear();
-  arduboy.pollButtons();
-
-  //Creeping text line effect for the long titles
-  if (creeping_on)
-    creepingLineEffect ();
-
-  //Draw menu sprite
-  Sprites::drawOverwrite(96, 0, menu, 0);
-
-  //Buttons checking
-  btnCheck ();
-
-  //Draw according to current mode
-  switch (mode) {
-    case 0:
-      mode7Draw (); //Draw a vishva vajra sprites for 7 counts mode
-      break;
-    case 1:
-      mode21Draw (); //Draw a vajra sprites for 21 counts mode
-      break;
-    case 2:
-      mode108Draw (); //Draw a counter for 108 counts mode
-      break;
-    case 3:
-      //Draw the tally counter one mode text
-      Sprites::drawOverwrite(96, 9, mode_tally1, 0);
-      modeTallyDraw (TALLY1_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
-      break;
-    case 4:
-      //Draw the tally counter two mode text
-      Sprites::drawOverwrite(96, 9, mode_tally2, 0);
-      modeTallyDraw (TALLY2_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
-      break;
-    case 5:
-      //Draw the tally counter three mode text
-      Sprites::drawOverwrite(96, 9, mode_tally3, 0);
-      modeTallyDraw (TALLY3_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
-      break;
-    case 6:
-      //Draw the tally counter four mode text
-      Sprites::drawOverwrite(96, 9, mode_tally4, 0);
-      modeTallyDraw (TALLY4_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
-      break;
-    case 7:
-      //Draw the tally counter five mode text
-      Sprites::drawOverwrite(96, 9, mode_tally5, 0);
-      modeTallyDraw (TALLY5_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
-      break;
-    case 8:
-      //Draw the tally counter six mode text
-      Sprites::drawOverwrite(96, 9, mode_tally6, 0);
-      modeTallyDraw (TALLY6_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
-      break;
-    case 9:
-      //Draw the tally counter seven mode text
-      Sprites::drawOverwrite(96, 9, mode_tally7, 0);
-      modeTallyDraw (TALLY7_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
-      break;
-    case 10:
-      //Draw the tally counter eight mode text
-      Sprites::drawOverwrite(96, 9, mode_tally8, 0);
-      modeTallyDraw (TALLY8_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
-      break;
-    case 11:
-      //Draw the tally counter nine mode text
-      Sprites::drawOverwrite(96, 9, mode_tally9, 0);
-      modeTallyDraw (TALLY9_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
-      break;
-    case 12:
-      //Draw the tally counter ten mode text
-      Sprites::drawOverwrite(96, 9, mode_tally10, 0);
-      modeTallyDraw (TALLY10_TITLE); //Draw a tally counter with optional "Title" (put "" for no title on screen or edit Titles.h)
-      break;
-    default:
-      // statements
-      break;
-  }
-
-  //Draw button UP with AUDIO OFF symbol
-  //Checking for pressed button B is performed so as not to interfere with the drawing of the pressed button B symbol
-  if (!arduboy.audio.enabled() && !arduboy.pressed(UP_BUTTON))
-    Sprites::drawOverwrite(96, 31, btnUpNoSnd, 0);
-
-  //Send screen buffer to serial for screen mirroring functionality
-  //Serial.write(arduboy.getBuffer(), 128 * 64 / 8);
-  
-  //Update display
-  arduboy.display();
 }
