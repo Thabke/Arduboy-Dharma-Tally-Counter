@@ -1,9 +1,10 @@
 # Arduboy-Dharma-Tally-Counter
-Tally counter for Arduboy compatible platform with dharmic bias.
+## Tally counter for Arduboy compatible platform with dharmic bias.
 
-Version 1.7
+<b>Version 1.7</b>
 
-Controls:<br>
+### Controls:
+
 [A] - increase counter<br>
 [B] - decrease counter<br>
 [B] (long press) - reset counter to 0<br>
@@ -19,7 +20,8 @@ In 'DharmaCounter.h' by changing the value of SCREEN_MAX_TIME in milliseconds, y
 
 <a href="https://felipemanga.github.io/ProjectABE/?url=https://github.com/Thabke/Arduboy-Dharma-Tally-Counter/raw/main/DharmaCounter/DharmaCounter.hex">Look in the emulator</a>
 
-Some screenshots:<br>
+### Some screenshots:
+
 <img src="https://github.com/Thabke/Arduboy-Dharma-Tally-Counter/raw/main/Screenshots/mode7.png" alt="Mode 7 counts" width="128" height="64">
 <img src="https://github.com/Thabke/Arduboy-Dharma-Tally-Counter/raw/main/Screenshots/mode21.png" alt="Mode 21 counts" width="128" height="64">
 <img src="https://github.com/Thabke/Arduboy-Dharma-Tally-Counter/raw/main/Screenshots/mode108.png" alt="Mode mala 108 counts (beads)" width="128" height="64">
